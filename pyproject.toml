@@ -1,0 +1,17 @@
+[project]
+name = "computer-caffeinator"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "pyautogui>=0.9.54",
+]
+
+[dependency-groups]
+dev = [
+    "black>=25.9.0",
+    "flake8>=7.3.0",
+    "mypy>=1.18.2",
+    "types-pyautogui>=0.9.3.20241230",
+]
