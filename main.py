@@ -3,7 +3,7 @@ import tkinter as tk
 
 def main():
     root = tk.Tk()
-    root.title("Simple Tkinter App")
+    root.title("Computer Caffeinator")
 
     entry = tk.Entry(root, width=40)
     entry.pack(padx=20, pady=20)
