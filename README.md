@@ -53,7 +53,7 @@ For code formatting, linting, and type checking, use the following tools (alread
 Use pyinstaller to create an executable:
 
 ```sh
-uvx pyinstaller --onefile main.py
+uvx pyinstaller --noconsole --onefile main.py
 ```
 
 ## License
