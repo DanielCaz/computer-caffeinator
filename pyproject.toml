@@ -1,7 +1,7 @@
 [project]
 name = "computer-caffeinator"
 version = "0.1.0"
-description = "Add your description here"
+description = "A simple Tkinter-based desktop app that simulates typing in a text entry box."
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
