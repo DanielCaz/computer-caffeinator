@@ -48,6 +48,14 @@ For code formatting, linting, and type checking, use the following tools (alread
 - [flake8](https://flake8.pycqa.org/en/latest/)
 - [mypy](http://mypy-lang.org/)
 
+## Building from Source
+
+Use pyinstaller to create an executable:
+
+```sh
+uvx pyinstaller --onefile main.py
+```
+
 ## License
 
 MIT License
