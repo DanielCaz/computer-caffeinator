@@ -1,7 +1,8 @@
 import tkinter as tk
-from tkinter import messagebox, filedialog
+from tkinter import messagebox, filedialog, ttk
 import threading
 import os
+import pyautogui
 from settings import load_config, save_config
 from automation import run_automation
 
@@ -10,31 +11,45 @@ class CaffeinatorApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Computer Caffeinator")
+        self.root.geometry("550x480")
+        self.root.resizable(True, False)
         self.config = load_config()
 
         self.create_widgets()
+        self.update_mouse_position()
 
     def create_widgets(self):
-        # Main container
-        main_frame = tk.Frame(self.root, padx=10, pady=10)
+        # Main container with padding
+        main_frame = ttk.Frame(self.root, padding="10")
         main_frame.pack(fill=tk.BOTH, expand=True)
 
-        # MS Word Path
-        tk.Label(main_frame, text="MS Word Path:").grid(row=0, column=0, sticky="w")
+        # --- Section 1: Application Setup ---
+        setup_frame = ttk.LabelFrame(main_frame, text="Application Setup", padding="10")
+        setup_frame.pack(fill=tk.X, pady=(0, 10))
+
+        ttk.Label(setup_frame, text="MS Word Path:").grid(row=0, column=0, sticky="w")
         self.word_path_var = tk.StringVar(value=self.config["ms_word_path"])
-        tk.Entry(main_frame, textvariable=self.word_path_var, width=40).grid(
-            row=0, column=1, padx=5
+        ttk.Entry(setup_frame, textvariable=self.word_path_var, width=50).grid(
+            row=0, column=1, padx=5, sticky="ew"
         )
-        tk.Button(main_frame, text="Browse", command=self.browse_word_path).grid(
-            row=0, column=2
+        ttk.Button(setup_frame, text="Browse", command=self.browse_word_path).grid(
+            row=0, column=2, padx=5
+        )
+        setup_frame.columnconfigure(1, weight=1)
+
+        # --- Section 2: Target Coordinates ---
+        coord_frame = ttk.LabelFrame(
+            main_frame, text="Target Coordinates", padding="10"
+        )
+        coord_frame.pack(fill=tk.X, pady=(0, 10))
+
+        # Row 0: Inputs
+        ttk.Label(coord_frame, text="Click Location (X, Y):").grid(
+            row=0, column=0, sticky="w"
         )
 
-        # Coordinates
-        tk.Label(main_frame, text="Coordinates (X, Y):").grid(
-            row=1, column=0, sticky="w", pady=(10, 0)
-        )
-        coord_frame = tk.Frame(main_frame)
-        coord_frame.grid(row=1, column=1, sticky="w", pady=(10, 0))
+        input_subframe = ttk.Frame(coord_frame)
+        input_subframe.grid(row=0, column=1, sticky="w", padx=5)
 
         self.coord_x_var = tk.IntVar(
             value=self.config["coordinates"]["blank_document"]["x"]
@@ -43,87 +58,113 @@ class CaffeinatorApp:
             value=self.config["coordinates"]["blank_document"]["y"]
         )
 
-        tk.Label(coord_frame, text="X:").pack(side=tk.LEFT)
-        tk.Entry(coord_frame, textvariable=self.coord_x_var, width=5).pack(
-            side=tk.LEFT, padx=5
+        ttk.Label(input_subframe, text="X:").pack(side=tk.LEFT)
+        ttk.Entry(input_subframe, textvariable=self.coord_x_var, width=6).pack(
+            side=tk.LEFT, padx=(0, 10)
         )
-        tk.Label(coord_frame, text="Y:").pack(side=tk.LEFT)
-        tk.Entry(coord_frame, textvariable=self.coord_y_var, width=5).pack(
-            side=tk.LEFT, padx=5
-        )
-
-        # Automation Settings
-        tk.Label(main_frame, text="Automation Settings:").grid(
-            row=2, column=0, sticky="w", pady=(10, 0)
+        ttk.Label(input_subframe, text="Y:").pack(side=tk.LEFT)
+        ttk.Entry(input_subframe, textvariable=self.coord_y_var, width=6).pack(
+            side=tk.LEFT
         )
 
-        tk.Label(main_frame, text="Text to Type:").grid(
-            row=3, column=0, sticky="w", padx=10
+        # Row 1: Tracker
+        self.tracking_var = tk.BooleanVar()
+        ttk.Checkbutton(
+            coord_frame, text="Show Realtime Mouse Position", variable=self.tracking_var
+        ).grid(row=1, column=0, columnspan=2, sticky="w", pady=(10, 0))
+
+        self.mouse_pos_label = ttk.Label(
+            coord_frame, text="Current Mouse Position: -", foreground="blue"
+        )
+        self.mouse_pos_label.grid(row=1, column=1, sticky="w", pady=(10, 0), padx=5)
+
+        # --- Section 3: Automation Details ---
+        auto_frame = ttk.LabelFrame(main_frame, text="Automation Details", padding="10")
+        auto_frame.pack(fill=tk.X, pady=(0, 10))
+
+        # Grid layout for automation
+        ttk.Label(auto_frame, text="Text to Type:").grid(
+            row=0, column=0, sticky="w", pady=2
         )
         self.text_var = tk.StringVar(value=self.config["automation"]["text"])
-        tk.Entry(main_frame, textvariable=self.text_var, width=40).grid(
-            row=3, column=1, padx=5
+        ttk.Entry(auto_frame, textvariable=self.text_var).grid(
+            row=0, column=1, sticky="ew", padx=5, pady=2
         )
 
-        tk.Label(main_frame, text="Interval (sec):").grid(
-            row=4, column=0, sticky="w", padx=10
+        ttk.Label(auto_frame, text="Typing Interval (sec):").grid(
+            row=1, column=0, sticky="w", pady=2
         )
         self.interval_var = tk.DoubleVar(value=self.config["automation"]["interval"])
-        tk.Entry(main_frame, textvariable=self.interval_var, width=10).grid(
-            row=4, column=1, sticky="w", padx=5
+        ttk.Entry(auto_frame, textvariable=self.interval_var, width=10).grid(
+            row=1, column=1, sticky="w", padx=5, pady=2
         )
 
-        tk.Label(main_frame, text="Loop Count:").grid(
-            row=5, column=0, sticky="w", padx=10
+        ttk.Label(auto_frame, text="Loop Count:").grid(
+            row=2, column=0, sticky="w", pady=2
         )
         self.loop_count_var = tk.IntVar(value=self.config["automation"]["loop_count"])
-        tk.Entry(main_frame, textvariable=self.loop_count_var, width=10).grid(
-            row=5, column=1, sticky="w", padx=5
+        ttk.Entry(auto_frame, textvariable=self.loop_count_var, width=10).grid(
+            row=2, column=1, sticky="w", padx=5, pady=2
         )
 
-        # Delays
-        tk.Label(main_frame, text="Delays (seconds):").grid(
-            row=6, column=0, sticky="w", pady=(10, 0)
-        )
+        auto_frame.columnconfigure(1, weight=1)
 
-        tk.Label(main_frame, text="App Start:").grid(
-            row=7, column=0, sticky="w", padx=10
+        # --- Section 4: Delays ---
+        delay_frame = ttk.LabelFrame(
+            main_frame, text="Timing & Delays (seconds)", padding="10"
+        )
+        delay_frame.pack(fill=tk.X, pady=(0, 10))
+
+        ttk.Label(delay_frame, text="App Start Wait:").grid(
+            row=0, column=0, sticky="w", padx=(0, 10)
         )
         self.delay_app_start_var = tk.IntVar(value=self.config["delays"]["app_start"])
-        tk.Entry(main_frame, textvariable=self.delay_app_start_var, width=10).grid(
-            row=7, column=1, sticky="w", padx=5
+        ttk.Entry(delay_frame, textvariable=self.delay_app_start_var, width=8).grid(
+            row=0, column=1, sticky="w"
         )
 
-        tk.Label(main_frame, text="Doc Ready:").grid(
-            row=8, column=0, sticky="w", padx=10
+        ttk.Label(delay_frame, text="Doc Ready Wait:").grid(
+            row=0, column=2, sticky="w", padx=(20, 10)
         )
         self.delay_doc_ready_var = tk.IntVar(value=self.config["delays"]["doc_ready"])
-        tk.Entry(main_frame, textvariable=self.delay_doc_ready_var, width=10).grid(
-            row=8, column=1, sticky="w", padx=5
+        ttk.Entry(delay_frame, textvariable=self.delay_doc_ready_var, width=8).grid(
+            row=0, column=3, sticky="w"
         )
 
-        tk.Label(main_frame, text="Line Pause:").grid(
-            row=9, column=0, sticky="w", padx=10
+        ttk.Label(delay_frame, text="Line Pause:").grid(
+            row=0, column=4, sticky="w", padx=(20, 10)
         )
         self.delay_line_pause_var = tk.IntVar(value=self.config["delays"]["line_pause"])
-        tk.Entry(main_frame, textvariable=self.delay_line_pause_var, width=10).grid(
-            row=9, column=1, sticky="w", padx=5
+        ttk.Entry(delay_frame, textvariable=self.delay_line_pause_var, width=8).grid(
+            row=0, column=5, sticky="w"
         )
 
-        # Buttons
-        btn_frame = tk.Frame(main_frame, pady=20)
-        btn_frame.grid(row=10, column=0, columnspan=3)
+        # --- Buttons ---
+        btn_frame = ttk.Frame(main_frame)
+        btn_frame.pack(fill=tk.X, pady=10)
 
-        tk.Button(btn_frame, text="Save Config", command=self.save_settings).pack(
-            side=tk.LEFT, padx=10
-        )
+        ttk.Button(
+            btn_frame, text="Save Configuration", command=self.save_settings
+        ).pack(side=tk.RIGHT, padx=5)
+
         tk.Button(
             btn_frame,
             text="Start Automation",
             command=self.start_automation,
-            bg="green",
+            bg="#4CAF50",
             fg="white",
-        ).pack(side=tk.LEFT, padx=10)
+            font=("Helvetica", 10, "bold"),
+            padx=20,
+            pady=5,
+        ).pack(side=tk.RIGHT, padx=5)
+
+    def update_mouse_position(self):
+        if self.tracking_var.get():
+            x, y = pyautogui.position()
+            self.mouse_pos_label.config(text=f"Current Mouse Position: X={x}, Y={y}")
+        else:
+            self.mouse_pos_label.config(text="Current Mouse Position: -")
+        self.root.after(100, self.update_mouse_position)
 
     def browse_word_path(self):
         filename = filedialog.askopenfilename(
