@@ -1,19 +1,19 @@
 {
-  "ms_word_path": "C:\\Program Files\\Microsoft Office\\root\\Office16\\WINWORD.EXE",
-  "coordinates": {
-    "blank_document": {
-      "x": 300,
-      "y": 250
+    "ms_word_path": "C:\\Program Files\\Microsoft Office\\root\\Office16\\WINWORD.EXE",
+    "coordinates": {
+        "blank_document": {
+            "x": 300,
+            "y": 250
+        }
+    },
+    "automation": {
+        "text": "This is an automated line typed by PyAutoGUI.",
+        "interval": 0.5,
+        "loop_count": 10
+    },
+    "delays": {
+        "app_start": 5,
+        "doc_ready": 3,
+        "line_pause": 1
     }
-  },
-  "automation": {
-    "text": "This is an automated line typed by PyAutoGUI.\n",
-    "interval": 0.05,
-    "loop_count": 5
-  },
-  "delays": {
-    "app_start": 5,
-    "doc_ready": 3,
-    "line_pause": 1
-  }
 }

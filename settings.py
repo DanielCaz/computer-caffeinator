@@ -13,4 +13,9 @@ def load_config():
         return json.load(f)
 
 
+def save_config(config):
+    with open(CONFIG_FILE, "w") as f:
+        json.dump(config, f, indent=4)
+
+
 config = load_config()
