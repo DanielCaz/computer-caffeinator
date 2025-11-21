@@ -1,46 +1,36 @@
-import tkinter as tk
+import os
+import pyautogui as pt
+from settings import config
 
 
 def main():
-    root = tk.Tk()
-    root.title("Computer Caffeinator")
+    ms_word_path = config["ms_word_path"]
 
-    entry = tk.Entry(root, width=40)
-    entry.pack(padx=20, pady=20)
-    entry.focus_set()
+    if not os.path.exists(ms_word_path):
+        print(f"Error: MS Word executable not found at {ms_word_path}")
+        return
 
-    running = {"flag": False, "after_id": None}
+    os.startfile(ms_word_path)
 
-    def typewriter(text, idx=0):
-        if not running["flag"]:
-            return
-        if idx <= len(text):
-            entry.delete(0, tk.END)
-            entry.insert(0, text[:idx])
-            running["after_id"] = root.after(80, typewriter, text, idx + 1)
-        else:
-            # Restart typewriting indefinitely
-            running["after_id"] = root.after(500, typewriter, text, 0)
+    pt.sleep(config["delays"]["app_start"])  # Wait for MS Word to open
 
-    def start_typewriting():
-        if not running["flag"]:
-            running["flag"] = True
-            typewriter("hello world")
+    coords = config["coordinates"]["blank_document"]
+    pt.moveTo(  # Coordinates for 'Blank document' (may vary by screen resolution)
+        coords["x"],
+        coords["y"],
+        duration=1,
+    )
+    pt.click()
 
-    def stop_typewriting():
-        running["flag"] = False
-        if running["after_id"]:
-            root.after_cancel(running["after_id"])
-            running["after_id"] = None
+    pt.sleep(config["delays"]["doc_ready"])  # Wait for the new document to be ready
 
-    btn_frame = tk.Frame(root)
-    btn_frame.pack(pady=10)
-    start_btn = tk.Button(btn_frame, text="Start", command=start_typewriting)
-    start_btn.pack(side=tk.LEFT, padx=5)
-    stop_btn = tk.Button(btn_frame, text="Stop", command=stop_typewriting)
-    stop_btn.pack(side=tk.LEFT, padx=5)
+    text = config["automation"]["text"]
+    interval = config["automation"]["interval"]
 
-    root.mainloop()
+    for _ in range(config["automation"]["loop_count"]):
+        pt.typewrite(text, interval=interval)
+
+        pt.sleep(config["delays"]["line_pause"])  # Pause between lines
 
 
 if __name__ == "__main__":

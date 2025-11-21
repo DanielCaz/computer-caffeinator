@@ -1,6 +1,6 @@
 # Computer Caffeinator
 
-A simple Tkinter-based desktop app that simulates typing in a text entry box. The app can repeatedly type out "hello world" in a typewriter effect, with Start and Stop buttons to control the animation.
+A Python automation script that keeps your computer active by simulating user activity in Microsoft Word. It opens Word, creates a new document, and types text repeatedly.
 
 ## Why the name?
 
@@ -8,15 +8,16 @@ Because it stops your computer from going to sleep and keeps it "caffeinated".
 
 ## Features
 
-- Minimal GUI using Tkinter
-- Typewriter animation effect for text
-- Start and Stop controls
-- Easy to run, no external dependencies except Tkinter (standard library) and pyautogui (for future enhancements)
+- Automates Microsoft Word startup and interaction
+- Configurable settings via `config.json`
+- Simulates mouse movement and keyboard typing
+- Customizable typing speed and loop count
 
 ## Requirements
 
 - Python 3.12 or higher
-- [pyautogui](https://pypi.org/project/PyAutoGUI/) (installed automatically if using `pyproject.toml`)
+- [pyautogui](https://pypi.org/project/PyAutoGUI/)
+- Microsoft Word (installed at the configured path)
 
 ## Installation
 
@@ -30,6 +31,39 @@ Because it stops your computer from going to sleep and keeps it "caffeinated".
    uv sync
    ```
 
+## Configuration
+
+The project uses a `config.json` file to manage settings. You can customize the following:
+
+- `ms_word_path`: Path to the Microsoft Word executable.
+- `coordinates`: Screen coordinates for clicking the "Blank document" template.
+- `automation`: Text to type, typing interval, and loop count.
+- `delays`: Wait times for application startup and document loading.
+
+Example `config.json`:
+
+```json
+{
+  "ms_word_path": "C:\\Program Files\\Microsoft Office\\root\\Office16\\WINWORD.EXE",
+  "coordinates": {
+    "blank_document": {
+      "x": 300,
+      "y": 250
+    }
+  },
+  "automation": {
+    "text": "This is an automated line typed by PyAutoGUI.\n",
+    "interval": 0.05,
+    "loop_count": 5
+  },
+  "delays": {
+    "app_start": 5,
+    "doc_ready": 3,
+    "line_pause": 1
+  }
+}
+```
+
 ## Usage
 
 Run the application with:
@@ -38,7 +72,11 @@ Run the application with:
 uv run main.py
 ```
 
-This will open a window with a text entry and Start/Stop buttons. Clicking Start will animate typing "hello world" in the entry box. Stop will halt the animation.
+The script will:
+
+1. Launch Microsoft Word.
+2. Click at the configured coordinates (default is for "Blank document").
+3. Type the configured text repeatedly into the document.
 
 ## Development
 
@@ -53,7 +91,7 @@ For code formatting, linting, and type checking, use the following tools (alread
 Use pyinstaller to create an executable:
 
 ```sh
-uvx pyinstaller --noconsole --onefile main.py
+uvx pyinstaller --onefile main.py
 ```
 
 ## License
