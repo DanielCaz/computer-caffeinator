@@ -8,8 +8,8 @@
     },
     "automation": {
         "text": "This is an automated line typed by PyAutoGUI.",
-        "interval": 0.5,
-        "loop_count": 10
+        "interval": 0.1,
+        "loop_count": 3
     },
     "delays": {
         "app_start": 5,
