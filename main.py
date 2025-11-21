@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox, filedialog
 import threading
+import os
 from settings import load_config, save_config
 from automation import run_automation
 
@@ -132,8 +133,44 @@ class CaffeinatorApp:
         if filename:
             self.word_path_var.set(filename)
 
+    def validate_inputs(self):
+        # Validate MS Word Path
+        if not os.path.exists(self.word_path_var.get()):
+            raise ValueError("The MS Word executable path does not exist.")
+
+        # Validate Coordinates
+        try:
+            x = self.coord_x_var.get()
+            y = self.coord_y_var.get()
+            if x < 0 or y < 0:
+                raise ValueError("Coordinates must be positive integers.")
+        except tk.TclError:
+            raise ValueError("Coordinates must be valid integers.")
+
+        # Validate Automation Settings
+        try:
+            if self.interval_var.get() < 0:
+                raise ValueError("Interval must be a non-negative number.")
+            if self.loop_count_var.get() <= 0:
+                raise ValueError("Loop count must be a positive integer.")
+        except tk.TclError:
+            raise ValueError("Interval and Loop Count must be valid numbers.")
+
+        # Validate Delays
+        try:
+            if (
+                self.delay_app_start_var.get() < 0
+                or self.delay_doc_ready_var.get() < 0
+                or self.delay_line_pause_var.get() < 0
+            ):
+                raise ValueError("Delays must be non-negative numbers.")
+        except tk.TclError:
+            raise ValueError("Delays must be valid numbers.")
+
     def save_settings(self):
         try:
+            self.validate_inputs()
+
             self.config["ms_word_path"] = self.word_path_var.get()
             self.config["coordinates"]["blank_document"]["x"] = self.coord_x_var.get()
             self.config["coordinates"]["blank_document"]["y"] = self.coord_y_var.get()
