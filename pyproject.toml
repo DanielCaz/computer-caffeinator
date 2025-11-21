@@ -1,6 +1,6 @@
 [project]
 name = "computer-caffeinator"
-version = "0.2.0"
+version = "0.3.0"
 description = "A Python automation script that keeps your computer active by simulating user activity in Microsoft Word. It opens Word, creates a new document, and types text repeatedly."
 readme = "README.md"
 requires-python = ">=3.12"

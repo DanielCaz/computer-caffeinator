@@ -29,5 +29,6 @@ def run_automation(config):
 
     for _ in range(config["automation"]["loop_count"]):
         pt.typewrite(text, interval=interval)
+        pt.press("enter")
 
         pt.sleep(config["delays"]["line_pause"])  # Pause between lines

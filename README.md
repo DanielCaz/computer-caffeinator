@@ -8,8 +8,9 @@ Because it stops your computer from going to sleep and keeps it "caffeinated".
 
 ## Features
 
+- **User-friendly GUI** for easy configuration and control
 - Automates Microsoft Word startup and interaction
-- Configurable settings via `config.json`
+- Configurable settings via `config.json` (automatically created if missing)
 - Simulates mouse movement and keyboard typing
 - Customizable typing speed and loop count
 
@@ -33,7 +34,9 @@ Because it stops your computer from going to sleep and keeps it "caffeinated".
 
 ## Configuration
 
-The project uses a `config.json` file to manage settings. You can customize the following:
+The project uses a `config.json` file to manage settings. This file is **automatically created with default values** if it does not exist.
+
+You can customize the settings directly through the application GUI or by editing `config.json`:
 
 - `ms_word_path`: Path to the Microsoft Word executable.
 - `coordinates`: Screen coordinates for clicking the "Blank document" template.
@@ -72,11 +75,14 @@ Run the application with:
 uv run main.py
 ```
 
-The script will:
+This will launch the **Computer Caffeinator** GUI.
 
-1. Launch Microsoft Word.
-2. Click at the configured coordinates (default is for "Blank document").
-3. Type the configured text repeatedly into the document.
+1. Verify or update the settings (Word path, coordinates, etc.).
+2. Click **Start Automation**.
+3. The script will:
+   - Launch Microsoft Word.
+   - Click at the configured coordinates (default is for "Blank document").
+   - Type the configured text repeatedly into the document.
 
 ## Development
 
@@ -91,7 +97,7 @@ For code formatting, linting, and type checking, use the following tools (alread
 Use pyinstaller to create an executable:
 
 ```sh
-uvx pyinstaller --onefile main.py
+uvx pyinstaller --noconsole --onefile  main.py
 ```
 
 ## License
